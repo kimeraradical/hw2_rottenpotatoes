@@ -13,14 +13,19 @@ class MoviesController < ApplicationController
     
     # yours implementation here
     #@movies = Movie.order(params[:sort]).all
-    @movies = Movie.where(params[:ratings].present? ? {:rating => (params[:ratings].keys)} :   {}).order(params[:sort])
     @sort = params[:sort]
     
     
-    @selected_ratings = (params[:ratings].present? ? params[:ratings] : [])
-    if @selected_ratings == []
-      @selected_ratings = Movie.ratings
+    
+    @movies = Movie.where(:rating => ($selected_ratings)).order(@sort)
+    if $selected_ratings == []
+      $selected_ratings = Movie.ratings
+    else
+      if params[:ratings].present?
+        $selected_ratings = params[:ratings].keys
+      end
     end
+    
     #@movies = Movie.all
   end
 
