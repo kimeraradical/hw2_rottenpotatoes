@@ -10,7 +10,7 @@ class MoviesController < ApplicationController
     if session[:movies_sort_column].present? && params[:sort].nil?
       redirect_to movies_path(sort: session[:movies_sort_column]) and return
     end
-
+    
     # yours implementation here
     @movies = Movie.order(params[:sort]).all
     #@movies = Movie.all
