@@ -14,7 +14,7 @@ class MoviesController < ApplicationController
     # yours implementation here
     #@movies = Movie.order(params[:sort]).all
     @sort = params[:sort]
-    if $selected_ratings == []
+    if $selected_ratings == [] or $selected_ratings == nil
       $selected_ratings = Movie.ratings
     else
       if params[:ratings].present?
