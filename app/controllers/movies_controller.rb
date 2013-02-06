@@ -38,7 +38,7 @@ class MoviesController < ApplicationController
     #  end
     #end
     
-     flash[:notice] = "#{session[@selected_ratings]}---#{session[:movies_sort_column]}"
+    # flash[:notice] = "#{session[@selected_ratings]}---#{session[:movies_sort_column]}"
     
     @movies = Movie.where(:rating => (@selected_ratings)).order(@sort)
    
