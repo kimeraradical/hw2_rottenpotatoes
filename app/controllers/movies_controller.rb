@@ -16,6 +16,8 @@ class MoviesController < ApplicationController
     @sort = params[:sort]
     if @sort != nil
       session[:movies_sort_column] = @sort
+    elsif
+      session.delete(:movies_sort_column)
     end
 
     @selected_ratings = params[:ratings] if params[:ratings] != nil or @selected_ratings == []
@@ -24,8 +26,10 @@ class MoviesController < ApplicationController
       
     elsif @selected_ratings == [] or @selected_ratings == nil
       @selected_ratings = Movie.ratings
+    
+      session.delete(:movies_ratings_column)
     end
-
+    
     
     
 
