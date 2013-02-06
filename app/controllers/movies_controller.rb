@@ -7,25 +7,41 @@ class MoviesController < ApplicationController
   end
 
   def index
-    if session[:movies_sort_column].present? && params[:sort].nil?
-      redirect_to movies_path(sort: session[:movies_sort_column]) and return
+    if (session[:movies_sort_column].present? && params[:sort].nil?) || (session[:movies_ratings_column].present? && params[:ratings].nil?)
+      redirect_to movies_path({sort: session[:movies_sort_column], ratings: session[:movies_ratings_column]}) and return   
     end
     
     # yours implementation here
     #@movies = Movie.order(params[:sort]).all
     @sort = params[:sort]
-    if $selected_ratings == [] or $selected_ratings == nil
-      $selected_ratings = Movie.ratings
-    else
-      if params[:ratings].present?
-        $selected_ratings = params[:ratings].keys
-      end
+    if @sort != nil
+      session[:movies_sort_column] = @sort
     end
+
+    @selected_ratings = params[:ratings] if params[:ratings] != nil or @selected_ratings == []
+    if @selected_ratings != nil
+      session[:movies_ratings_column] = @selected_ratings
+      
+    elsif @selected_ratings == [] or @selected_ratings == nil
+      @selected_ratings = Movie.ratings
+    end
+
     
     
-    @movies = Movie.where(:rating => ($selected_ratings)).order(@sort)
+
+
+    #if $selected_ratings == [] or $selected_ratings == nil
+    #  $selected_ratings = Movie.ratings
+    #else
+    #  if params[:ratings].present?
+    #    $selected_ratings = params[:ratings].keys
+    #  end
+    #end
     
+     flash[:notice] = "#{session[@selected_ratings]}---#{session[:movies_sort_column]}"
     
+    @movies = Movie.where(:rating => (@selected_ratings)).order(@sort)
+   
     #@movies = Movie.all
   end
 
