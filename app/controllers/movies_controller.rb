@@ -1,56 +1,33 @@
 class MoviesController < ApplicationController
 
   def show
-    id = params[:id] # retrieve movie ID from URI route
-    @movie = Movie.find(id) # look up movie by unique ID
-    # will render app/views/movies/show.<extension> by default
+    id = params[:id]
+    @movie = Movie.find(id)
   end
 
   def index
-    #if (session[:movies_sort_column].present? && params[:sort].nil?) || (session[:movies_ratings_column].present? && params[:ratings].nil?)
-    #  redirect_to movies_path({sort: session[:movies_sort_column], ratings: session[:movies_ratings_column]}) and return   
-    #end
-    
-    # yours implementation here
-    #@movies = Movie.order(params[:sort]).all
-    @sort = params[:sort]
-    if @sort != nil
-      session[:movies_sort_column] = @sort
-    elsif
-      session.delete(:movies_sort_column)
+    filters = {:sort => "", :ratings => {}}
+    redirect = false
+    filters.each do |filter, default|
+      if params[filter].blank?
+        if !session[filter].blank?
+          redirect = true
+          params[filter] = session[filter]
+        else
+          params[filter] = default
+        end
+      end
+      session[filter] = params[filter]
     end
+    redirect_to movies_path(:sort => params[:sort], :ratings => params[:ratings]) if redirect
 
-    @selected_ratings = params[:ratings] if params[:ratings] != nil or @selected_ratings == []
-    if @selected_ratings != nil
-      session[:movies_ratings_column] = @selected_ratings
-      
-    elsif @selected_ratings == [] or @selected_ratings == nil
-      @selected_ratings = Movie.ratings
+    @all_ratings = Movie.ratings
     
-      session.delete(:movies_ratings_column)
-    end
-    
-    
-    
-
-
-    #if $selected_ratings == [] or $selected_ratings == nil
-    #  $selected_ratings = Movie.ratings
-    #else
-    #  if params[:ratings].present?
-    #    $selected_ratings = params[:ratings].keys
-    #  end
-    #end
-    
-    # flash[:notice] = "#{session[@selected_ratings]}---#{session[:movies_sort_column]}"
-    
-    @movies = Movie.where(:rating => (@selected_ratings)).order(@sort)
-   
-    #@movies = Movie.all
+    @movies = Movie.filtered(params)
   end
 
   def new
-    # default: render 'new' template
+    session.clear
   end
 
   def create
